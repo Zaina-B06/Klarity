@@ -9,3 +9,4 @@ anthropic
 requests
 passlib[bcrypt]
 python-jose[cryptography]
+google-generativeai

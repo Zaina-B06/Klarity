@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUsers, getTasks } from '../api'
+import { getUsers, getTasks, getInsights } from '../api'
 
 const getHealth = (rate) => {
   if (rate >= 80) return { label: 'On Track', color: 'var(--success)', bg: 'var(--success-light)', border: '#10B981' }
@@ -12,15 +12,23 @@ export default function Dashboard() {
   const [users, setUsers] = useState([])
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
+  const [insights, setInsights] = useState([])
+  const [insightsLoading, setInsightsLoading] = useState(true)
+  const [insightsOpen, setInsightsOpen] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    Promise.all([getUsers(), getTasks()]).then(([u, t]) => {
-      setUsers(u.data.filter(u => u.role === 'employee'))
-      setTasks(t.data)
-      setLoading(false)
-    })
-  }, [])
+  Promise.all([getUsers(), getTasks()]).then(([u, t]) => {
+    setUsers(u.data.filter(u => u.role === 'employee'))
+    setTasks(t.data)
+    setLoading(false)
+  })
+
+  getInsights().then(res => {
+    setInsights(res.data)
+    setInsightsLoading(false)
+  })
+}, [])
 
   const getStats = (employeeId) => {
     const assigned = tasks.filter(t => t.assigned_to === employeeId)
@@ -73,6 +81,81 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {/* AI Insights section */}
+<div style={{ marginBottom: 32 }}>
+  <div
+    onClick={() => setInsightsOpen(!insightsOpen)}
+    style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      marginBottom: insightsOpen ? 16 : 0, cursor: 'pointer',
+      userSelect: 'none'
+    }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{
+        background: '#EEF2FF', color: '#4F46E5', fontSize: 11,
+        fontWeight: 700, padding: '4px 12px', borderRadius: 20,
+        letterSpacing: '0.05em'
+      }}>AI INSIGHTS</div>
+      <span style={{ fontSize: 13, color: 'var(--muted)' }}>
+        {insightsLoading ? 'Generating...' : `${insights.length} employees analyzed`}
+      </span>
+    </div>
+    <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500 }}>
+      {insightsOpen ? '▲ Hide' : '▼ Show'}
+    </span>
+  </div>
+
+  {insightsOpen && (
+    insightsLoading ? (
+      <div style={{
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: 12, padding: '20px 24px', color: 'var(--muted)', fontSize: 14
+      }}>
+        Analyzing team performance...
+      </div>
+    ) : (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+        {insights.map(({ employee_id, name, insights: obs }) => (
+          <div key={employee_id} onClick={() => navigate(`/employee/${employee_id}`)} style={{
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderLeft: '3px solid #4F46E5', borderRadius: 12,
+            padding: '14px 18px', cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            transition: 'box-shadow 0.15s'
+          }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: '50%',
+                background: '#EEF2FF', color: '#4F46E5',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 10, fontWeight: 700, flexShrink: 0
+              }}>
+                {name.split(' ').map(n => n[0]).join('')}
+              </div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#4F46E5' }}>{name}</p>
+            </div>
+            {obs.map((text, i) => (
+              <div key={i} style={{
+                display: 'flex', gap: 8, alignItems: 'flex-start',
+                marginBottom: i < obs.length - 1 ? 8 : 0,
+                paddingBottom: i < obs.length - 1 ? 8 : 0,
+                borderBottom: i < obs.length - 1 ? '1px solid var(--border)' : 'none'
+              }}>
+                <span style={{ color: '#4F46E5', fontSize: 12, marginTop: 2, flexShrink: 0 }}>→</span>
+                <p style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.5, margin: 0 }}>{text}</p>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    )
+  )}
+</div>
 
       {/* Employee cards */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>

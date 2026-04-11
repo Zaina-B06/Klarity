@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import MyTasks from './pages/MyTasks'
 import EmployeeDetail from './pages/EmployeeDetail'
+import MyAnalytics from './pages/MyAnalytics'
 import Landing from './pages/Landing'
 import './index.css'
 
@@ -68,6 +69,13 @@ function ProtectedEmployee() {
   return <MyTasks />
 }
 
+function ProtectedEmployeeAnalytics() {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" />
+  if (user.role === 'manager') return <Navigate to="/dashboard" />
+  return <MyAnalytics />
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -77,6 +85,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/my-tasks" element={<ProtectedEmployee />} />
+          <Route path="/my-analytics" element={<ProtectedEmployeeAnalytics />} />
           <Route path="/dashboard" element={<ManagerLayout><Dashboard /></ManagerLayout>} />
           <Route path="/tasks" element={<ManagerLayout><Tasks /></ManagerLayout>} />
           <Route path="/analytics" element={<ManagerLayout><Analytics /></ManagerLayout>} />
