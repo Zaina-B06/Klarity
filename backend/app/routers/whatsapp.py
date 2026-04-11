@@ -1,5 +1,9 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import PlainTextResponse
+from sqlalchemy.orm import Session
+from app.database import SessionLocal
+from app.models import User, Task, StatusEnum
+from datetime import datetime
 import os
 import requests
 from dotenv import load_dotenv
@@ -17,7 +21,6 @@ async def verify_webhook(request: Request):
     mode = params.get("hub.mode")
     token = params.get("hub.verify_token")
     challenge = params.get("hub.challenge")
-
     if mode == "subscribe" and token == VERIFY_TOKEN:
         return PlainTextResponse(content=challenge)
     raise HTTPException(status_code=403, detail="Verification failed")
@@ -25,6 +28,7 @@ async def verify_webhook(request: Request):
 @router.post("/whatsapp/webhook")
 async def receive_message(request: Request):
     data = await request.json()
+    print(f"Webhook received: {data}")
     try:
         entry = data["entry"][0]
         changes = entry["changes"][0]
@@ -33,19 +37,48 @@ async def receive_message(request: Request):
 
         for message in messages:
             if message["type"] == "text":
-                text = message["text"]["body"].strip().lower()
-                from_number = message["from"]
+                text = message["text"]["body"].strip().upper()
+                from_number = "+" + message["from"]
 
-                if text == "done":
-                    return {"status": "received", "action": "task_done", "from": from_number}
+                db = SessionLocal()
+                try:
+                    user = db.query(User).filter(
+                        User.phone_number == from_number
+                    ).first()
+
+                    if user:
+                        # Get their most recent non-done task
+                        task = db.query(Task).filter(
+                            Task.assigned_to == user.id,
+                            Task.status != StatusEnum.done
+                        ).order_by(Task.created_at.desc()).first()
+
+                        if task:
+                            if text == "DONE":
+                                task.status = StatusEnum.done
+                                task.completed_at = datetime.utcnow()
+                                db.commit()
+                                send_reply(from_number, f"✅ Great work {user.name}! *{task.title}* marked as done.")
+                            elif text == "START":
+                                task.status = StatusEnum.in_progress
+                                db.commit()
+                                send_reply(from_number, f"▶️ Got it {user.name}! *{task.title}* is now in progress.")
+                            else:
+                                send_reply(from_number, "Reply *DONE* to complete your latest task or *START* to begin it.")
+                        else:
+                            send_reply(from_number, "✅ You have no pending tasks right now. Great work!")
+                    else:
+                        print(f"Unknown number: {from_number}")
+                finally:
+                    db.close()
 
     except Exception as e:
         print(f"Webhook error: {e}")
 
     return {"status": "ok"}
 
-def send_whatsapp_message(to_number: str, message: str):
-    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+def send_reply(to_number: str, message: str):
+    url = f"https://graph.facebook.com/v25.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {WHATSAPP_TOKEN}",
         "Content-Type": "application/json"
@@ -56,5 +89,8 @@ def send_whatsapp_message(to_number: str, message: str):
         "type": "text",
         "text": {"body": message}
     }
-    response = requests.post(url, headers=headers, json=payload)
-    return response.json()
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        print(f"Reply sent: {response.status_code}")
+    except Exception as e:
+        print(f"Reply error: {e}")

@@ -13,7 +13,7 @@ router = APIRouter()
 def send_whatsapp_message(to_number: str, message: str):
     token = os.getenv("META_WHATSAPP_TOKEN")
     phone_id = os.getenv("META_PHONE_NUMBER_ID")
-    url = f"https://graph.facebook.com/v18.0/{phone_id}/messages"
+    url = f"https://graph.facebook.com/v25.0/{phone_id}/messages"
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
@@ -25,7 +25,8 @@ def send_whatsapp_message(to_number: str, message: str):
         "text": {"body": message}
     }
     try:
-        requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload)
+        print(f"WhatsApp response: {response.status_code} — {response.json()}")
     except Exception as e:
         print(f"WhatsApp error: {e}")
 
@@ -67,13 +68,19 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 
     # Send WhatsApp notification
     deadline_str = db_task.deadline.strftime('%d %b %Y') if db_task.deadline else 'No deadline'
+    priority_emoji = "🔴" if db_task.priority == "high" else "🟡" if db_task.priority == "medium" else "🟢"
     message = (
-        f"Hi {assignee.name}! You have a new task on Klarity.\n\n"
-        f"Task: {db_task.title}\n"
-        f"Priority: {db_task.priority.upper()}\n"
-        f"Deadline: {deadline_str}\n\n"
-        f"Reply DONE when you complete it."
-    )
+        f"👋 Hi {assignee.name}!\n\n"
+        f"You have a new task assigned on *Klarity*.\n\n"
+        f"📋 *{db_task.title}*\n"
+        f"{priority_emoji} Priority: {db_task.priority.upper()}\n"
+        f"📅 Deadline: {deadline_str}\n"
+        f"{f'📝 {db_task.description}' if db_task.description else ''}\n\n"
+        f"Reply with:\n"
+        f"▶️ *START* — to mark as in progress\n"
+        f"✅ *DONE* — to mark as complete\n\n"
+        f"— Klarity Workforce"
+)
     send_whatsapp_message(assignee.phone_number, message)
 
     return db_task
