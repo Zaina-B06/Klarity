@@ -5,8 +5,29 @@ from app.models import User, Task, StatusEnum
 from app.schemas import UserCreate, UserResponse, TaskCreate, TaskUpdate, TaskResponse
 from datetime import datetime
 from typing import List
+import requests
+import os
 
 router = APIRouter()
+
+def send_whatsapp_message(to_number: str, message: str):
+    token = os.getenv("META_WHATSAPP_TOKEN")
+    phone_id = os.getenv("META_PHONE_NUMBER_ID")
+    url = f"https://graph.facebook.com/v18.0/{phone_id}/messages"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "text",
+        "text": {"body": message}
+    }
+    try:
+        requests.post(url, headers=headers, json=payload)
+    except Exception as e:
+        print(f"WhatsApp error: {e}")
 
 # --- User routes ---
 
@@ -43,6 +64,18 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
+
+    # Send WhatsApp notification
+    deadline_str = db_task.deadline.strftime('%d %b %Y') if db_task.deadline else 'No deadline'
+    message = (
+        f"Hi {assignee.name}! You have a new task on Klarity.\n\n"
+        f"Task: {db_task.title}\n"
+        f"Priority: {db_task.priority.upper()}\n"
+        f"Deadline: {deadline_str}\n\n"
+        f"Reply DONE when you complete it."
+    )
+    send_whatsapp_message(assignee.phone_number, message)
+
     return db_task
 
 @router.get("/tasks", response_model=List[TaskResponse])
