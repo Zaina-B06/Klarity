@@ -5,6 +5,7 @@ from app import models
 from app.routers import router
 from app.routers.auth import router as auth_router
 from app.routers.insights import router as insights_router
+from app.routers.whatsapp import router as whatsapp_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,6 +22,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/api/auth")
 app.include_router(insights_router, prefix="/api")
 app.include_router(router, prefix="/api")
+app.include_router(whatsapp_router, prefix="/api")
 
 @app.get("/")
 def health_check():
