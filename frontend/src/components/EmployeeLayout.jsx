@@ -1,21 +1,8 @@
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
-import Dashboard from './pages/Dashboard'
-import Tasks from './pages/Tasks'
-import Analytics from './pages/Analytics'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import MyTasks from './pages/MyTasks'
-import Landing from './pages/Landing'
-import EmployeeDetail from './pages/EmployeeDetail'
-import MyAnalytics from './pages/MyAnalytics'
-import AIAdvisor from './pages/AIAdvisor'
-import EmployeeLayout from './components/EmployeeLayout'
-import MyAdvisor from './pages/MyAdvisor'
-import './index.css'
 
-function ManagerLayout({ children }) {
+export default function EmployeeLayout({ children }) {
   const { user, logout } = useAuth()
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('klarity_theme') === 'dark')
 
@@ -24,8 +11,7 @@ function ManagerLayout({ children }) {
     localStorage.setItem('klarity_theme', darkMode ? 'dark' : 'light')
   }, [darkMode])
 
-  if (!user) return <Navigate to="/login" />
-  if (user.role !== 'manager') return <Navigate to="/my-tasks" />
+  const initials = user.name.split(' ').map(n => n[0]).join('')
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
@@ -59,10 +45,9 @@ function ManagerLayout({ children }) {
         <div style={{ padding: '16px 12px', flex: 1 }}>
           <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.08em', padding: '0 8px', marginBottom: 8 }}>MENU</p>
           {[
-            { to: '/dashboard', label: 'Dashboard', icon: '▦' },
-            { to: '/tasks', label: 'Tasks', icon: '✓' },
-            { to: '/analytics', label: 'Analytics', icon: '∿' },
-            { to: '/advisor', label: 'AI Advisor', icon: '✦' },
+            { to: '/my-tasks', label: 'My Tasks', icon: '✓' },
+            { to: '/my-analytics', label: 'My Analytics', icon: '∿' },
+            { to: '/my-advisor', label: 'My Coach', icon: '✦' },
           ].map(({ to, label, icon }) => (
             <NavLink key={to} to={to} style={({ isActive }) => ({
               display: 'flex', alignItems: 'center', gap: 10,
@@ -88,12 +73,10 @@ function ManagerLayout({ children }) {
             background: 'var(--accent-light)', color: 'var(--accent)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 12, fontWeight: 700, flexShrink: 0
-          }}>
-            {user.name.split(' ').map(n => n[0]).join('')}
-          </div>
+          }}>{initials}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</p>
-            <p style={{ fontSize: 11, color: 'var(--muted)' }}>Manager</p>
+            <p style={{ fontSize: 11, color: 'var(--muted)' }}>{user.department || 'Employee'}</p>
           </div>
           <button onClick={logout} title="Logout" style={{
             background: 'none', border: '1px solid var(--border)',
@@ -112,48 +95,5 @@ function ManagerLayout({ children }) {
         {children}
       </main>
     </div>
-  )
-}
-
-function ProtectedEmployee() {
-  const { user } = useAuth()
-  if (!user) return <Navigate to="/login" />
-  if (user.role === 'manager') return <Navigate to="/dashboard" />
-  return <EmployeeLayout><MyTasks /></EmployeeLayout>
-}
-
-function ProtectedEmployeeAnalytics() {
-  const { user } = useAuth()
-  if (!user) return <Navigate to="/login" />
-  if (user.role === 'manager') return <Navigate to="/dashboard" />
-  return <EmployeeLayout><MyAnalytics /></EmployeeLayout>
-}
-
-function ProtectedEmployeeAdvisor() {
-  const { user } = useAuth()
-  if (!user) return <Navigate to="/login" />
-  if (user.role === 'manager') return <Navigate to="/dashboard" />
-  return <EmployeeLayout><MyAdvisor /></EmployeeLayout>
-}
-
-export default function App() {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/my-tasks" element={<ProtectedEmployee />} />
-          <Route path="/my-analytics" element={<ProtectedEmployeeAnalytics />} />
-          <Route path="/dashboard" element={<ManagerLayout><Dashboard /></ManagerLayout>} />
-          <Route path="/tasks" element={<ManagerLayout><Tasks /></ManagerLayout>} />
-          <Route path="/analytics" element={<ManagerLayout><Analytics /></ManagerLayout>} />
-          <Route path="/employee/:id" element={<ManagerLayout><EmployeeDetail /></ManagerLayout>} />
-          <Route path="/my-advisor" element={<ProtectedEmployeeAdvisor />} />
-          <Route path="/advisor" element={<ManagerLayout><AIAdvisor /></ManagerLayout>} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
   )
 }

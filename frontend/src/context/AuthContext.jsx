@@ -15,10 +15,11 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
-    localStorage.removeItem('klarity_token')
-    localStorage.removeItem('klarity_user')
-    setUser(null)
-  }
+  localStorage.removeItem('klarity_token')
+  localStorage.removeItem('klarity_user')
+  setUser(null)
+  window.location.href = '/'
+}
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

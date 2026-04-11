@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: 'http://localhost:8000/api' })
+const api = axios.create({ 
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+})
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('klarity_token')
@@ -18,3 +20,6 @@ export const updateTaskStatus = (id, status) => api.patch(`/tasks/${id}/status`,
 export const deleteTask = (id) => api.delete(`/tasks/${id}`)
 export const getInsights = () => api.get('/insights')
 export const getEmployeeInsights = (id) => api.get(`/insights/${id}`)
+export const remindEmployee = (taskId) => api.post(`/tasks/${taskId}/remind`)
+export const reassignTask = (taskId, assignedTo) => api.patch(`/tasks/${taskId}/reassign`, { assigned_to: assignedTo })
+export const getAdvisorInsights = () => api.get('/advisor')
