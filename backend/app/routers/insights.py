@@ -1,103 +1,66 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import User, Task, RoleEnum
+from app.models import User, Task
 from groq import Groq
 import os
-import time
-from dotenv import load_dotenv
-load_dotenv()
 
 router = APIRouter()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def build_prompt(user, tasks):
-    assigned = [t for t in tasks if t.assigned_to == user.id]
-    if not assigned:
+def get_employee_insights(employee_id: int, db: Session):
+    employee = db.query(User).filter(User.id == employee_id).first()
+    if not employee:
         return None
 
-    done = [t for t in assigned if t.status == 'done']
-    pending = [t for t in assigned if t.status == 'pending']
-    in_progress = [t for t in assigned if t.status == 'in_progress']
-    overdue = [t for t in assigned if
-               t.status != 'done' and t.deadline and
-               t.deadline.timestamp() < time.time()]
-    rate = round((len(done) / len(assigned)) * 100) if assigned else 0
+    tasks = db.query(Task).filter(Task.assigned_to == employee_id).all()
+    if not tasks:
+        return {"employee_id": employee_id, "name": employee.name, "insights": ["No tasks assigned yet."]}
 
-    task_details = "\n".join([
-        f"- '{t.title}' | priority: {t.priority} | status: {t.status} | deadline: {t.deadline.strftime('%Y-%m-%d') if t.deadline else 'none'}"
-        for t in assigned
-    ])
+    from datetime import datetime
+    total = len(tasks)
+    done = [t for t in tasks if t.status == 'done']
+    pending = [t for t in tasks if t.status == 'pending']
+    in_progress = [t for t in tasks if t.status == 'in_progress']
+    overdue = [t for t in tasks if t.status != 'done' and t.deadline and t.deadline < datetime.utcnow()]
+    high_priority = [t for t in tasks if t.priority == 'high']
+    high_done = [t for t in high_priority if t.status == 'done']
+    rate = round((len(done) / total) * 100) if total > 0 else 0
 
-    return f"""You are an AI workforce analyst for a small business manager.
-Analyze this employee's task data and return exactly 2 short plain-English observations.
+    prompt = f"""You are an HR analytics AI. Analyze this employee's work data and provide exactly 4 short, specific, actionable insights. Each insight should be 1 sentence. Be direct and data-driven. No bullet points, no numbering — just return 4 lines separated by newlines.
 
-Employee: {user.name}
-Total tasks: {len(assigned)}
-Completed: {len(done)}
+Employee: {employee.name}
+Department: {employee.department or 'General'}
+Total tasks: {total}
+Completed: {len(done)} ({rate}%)
 In progress: {len(in_progress)}
 Pending: {len(pending)}
 Overdue: {len(overdue)}
-Completion rate: {rate}%
+High priority tasks: {len(high_priority)} total, {len(high_done)} completed
+Task titles: {', '.join([t.title for t in tasks[:8]])}
 
-Task details:
-{task_details}
-
-Rules:
-- Be direct and specific, not generic
-- Each insight must be MAX 15 words — short and punchy
-- No long explanations
-- keep bullet points, numbers, labels
-- Tone: direct manager assistant
-"""
-
-@router.get("/insights/{employee_id}")
-def get_employee_insights(employee_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == employee_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Employee not found")
-
-    tasks = db.query(Task).all()
-    prompt = build_prompt(user, tasks)
-
-    if not prompt:
-        return {"employee_id": employee_id, "name": user.name, "insights": ["No tasks assigned yet."]}
+Generate 4 specific insights about performance, risk areas, strengths, and recommended actions."""
 
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=200
+            max_tokens=300
         )
         raw = response.choices[0].message.content.strip()
-        insights = [line.strip() for line in raw.split('\n') if line.strip()]
-        return {"employee_id": employee_id, "name": user.name, "insights": insights[:2]}
+        insights = [line.strip().lstrip('*•-').strip() for line in raw.split('\n') if line.strip()][:4]
+        return {"employee_id": employee_id, "name": employee.name, "insights": insights}
     except Exception as e:
-        print(f"Groq error: {e}")
-        return {"employee_id": employee_id, "name": user.name, "insights": ["Unable to generate insights right now."]}
+        return {"employee_id": employee_id, "name": employee.name, "insights": [f"AI analysis unavailable: {str(e)}"]}
 
 @router.get("/insights")
 def get_all_insights(db: Session = Depends(get_db)):
-    employees = db.query(User).filter(User.role == RoleEnum.employee).all()
-    tasks = db.query(Task).all()
-    results = []
+    employees = db.query(User).filter(User.role == 'employee').all()
+    return [get_employee_insights(emp.id, db) for emp in employees]
 
-    for user in employees:
-        prompt = build_prompt(user, tasks)
-        if not prompt:
-            results.append({"employee_id": user.id, "name": user.name, "insights": ["No tasks assigned yet."]})
-            continue
-        try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=200
-            )
-            raw = response.choices[0].message.content.strip()
-            insights = [line.strip() for line in raw.split('\n') if line.strip()]
-            results.append({"employee_id": user.id, "name": user.name, "insights": insights[:2]})
-        except Exception as e:
-            print(f"Groq error for {user.name}: {e}")
-            results.append({"employee_id": user.id, "name": user.name, "insights": ["Unable to generate insights right now."]})
-
-    return results
+@router.get("/insights/{employee_id}")
+def get_insight(employee_id: int, db: Session = Depends(get_db)):
+    result = get_employee_insights(employee_id, db)
+    if not result:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return result
