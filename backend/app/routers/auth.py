@@ -5,6 +5,7 @@ from app.models import User, RoleEnum
 from app.services.auth import hash_password, verify_password, create_access_token
 from pydantic import BaseModel
 from typing import Optional
+from typing import Optional
 
 router = APIRouter()
 
@@ -13,6 +14,7 @@ class RegisterRequest(BaseModel):
     phone_number: str
     role: str
     password: str
+    department: Optional[str] = None
 
 class LoginRequest(BaseModel):
     phone_number: str
@@ -30,11 +32,12 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Phone number already registered")
     user = User(
-        name=data.name,
-        phone_number=data.phone_number,
-        role=data.role,
-        password_hash=hash_password(data.password)
-    )
+    name=data.name,
+    phone_number=data.phone_number,
+    role=data.role,
+    department=data.department,
+    password_hash=hash_password(data.password)
+)
     db.add(user)
     db.commit()
     db.refresh(user)

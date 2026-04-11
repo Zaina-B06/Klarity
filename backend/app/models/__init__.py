@@ -26,6 +26,7 @@ class User(Base):
     phone_number = Column(String(20), unique=True, nullable=False)
     role = Column(Enum(RoleEnum), nullable=False)
     password_hash = Column(String(255), nullable=True)
+    department = Column(String(100), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     assigned_tasks = relationship("Task", foreign_keys="Task.assigned_to", back_populates="assignee")

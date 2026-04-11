@@ -22,12 +22,14 @@ class UserCreate(BaseModel):
     name: str
     phone_number: str
     role: RoleEnum
+    department: Optional[str] = None
 
 class UserResponse(BaseModel):
     id: int
     name: str
     phone_number: str
     role: RoleEnum
+    department: Optional[str] = None
     created_at: datetime
 
     class Config:
