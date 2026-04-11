@@ -116,3 +116,26 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.delete(task)
     db.commit()
     return {"message": "Task deleted"}
+@router.post("/tasks/{task_id}/remind")
+def remind_employee(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    assignee = db.query(User).filter(User.id == task.assigned_to).first()
+    if not assignee:
+        raise HTTPException(status_code=404, detail="Assignee not found")
+
+    deadline_str = task.deadline.strftime('%d %b %Y') if task.deadline else 'No deadline'
+    priority_emoji = "🔴" if task.priority == "high" else "🟡" if task.priority == "medium" else "🟢"
+
+    message = (
+        f"⏰ *Reminder from Klarity*\n\n"
+        f"Hi {assignee.name}! This is a reminder about your pending task.\n\n"
+        f"📋 *{task.title}*\n"
+        f"{priority_emoji} Priority: {task.priority.upper()}\n"
+        f"📅 Deadline: {deadline_str}\n\n"
+        f"Reply *DONE* when complete or *START* to begin.\n\n"
+        f"— Klarity Workforce"
+    )
+    send_whatsapp_message(assignee.phone_number, message)
+    return {"message": "Reminder sent successfully"}
