@@ -27,3 +27,18 @@ app.include_router(whatsapp_router, prefix="/api")
 @app.get("/")
 def health_check():
     return {"status": "Klarity API is running"}
+
+import threading
+import requests
+import time
+
+def keep_alive():
+    while True:
+        time.sleep(14 * 60)
+        try:
+            requests.get("https://klarity-production-1c11.up.railway.app/")
+            print("Keep-alive ping sent")
+        except:
+            pass
+
+threading.Thread(target=keep_alive, daemon=True).start()

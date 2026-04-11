@@ -116,6 +116,7 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.delete(task)
     db.commit()
     return {"message": "Task deleted"}
+
 @router.post("/tasks/{task_id}/remind")
 def remind_employee(task_id: int, db: Session = Depends(get_db)):
     task = db.query(Task).filter(Task.id == task_id).first()
@@ -139,3 +140,30 @@ def remind_employee(task_id: int, db: Session = Depends(get_db)):
     )
     send_whatsapp_message(assignee.phone_number, message)
     return {"message": "Reminder sent successfully"}
+
+@router.patch("/tasks/{task_id}/reassign")
+def reassign_task(task_id: int, data: dict, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    new_assignee = db.query(User).filter(User.id == data["assigned_to"]).first()
+    if not new_assignee:
+        raise HTTPException(status_code=404, detail="User not found")
+    task.assigned_to = data["assigned_to"]
+    db.commit()
+    db.refresh(task)
+
+    # Notify new assignee via WhatsApp
+    deadline_str = task.deadline.strftime('%d %b %Y') if task.deadline else 'No deadline'
+    priority_emoji = "🔴" if task.priority == "high" else "🟡" if task.priority == "medium" else "🟢"
+    message = (
+        f"📋 *Task Reassigned to You on Klarity*\n\n"
+        f"Hi {new_assignee.name}! A task has been assigned to you.\n\n"
+        f"📋 *{task.title}*\n"
+        f"{priority_emoji} Priority: {task.priority.upper()}\n"
+        f"📅 Deadline: {deadline_str}\n\n"
+        f"Reply *START* to begin or *DONE* when complete.\n\n"
+        f"— Klarity Workforce"
+    )
+    send_whatsapp_message(new_assignee.phone_number, message)
+    return task
