@@ -167,3 +167,16 @@ def reassign_task(task_id: int, data: dict, db: Session = Depends(get_db)):
     )
     send_whatsapp_message(new_assignee.phone_number, message)
     return task
+
+@router.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.role == 'manager':
+        raise HTTPException(status_code=400, detail="Cannot delete a manager")
+    # Delete their tasks first
+    db.query(Task).filter(Task.assigned_to == user_id).delete()
+    db.delete(user)
+    db.commit()
+    return {"message": "Employee deleted"}

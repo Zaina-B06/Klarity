@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUsers, getTasks, getInsights, registerUser } from '../api'
+import { getUsers, getTasks, getInsights, registerUser, deleteUser } from '../api'
 
 const getHealth = (rate) => {
   if (rate >= 80) return { label: 'On Track', color: '#10B981', bg: '#ECFDF5', border: '#10B981' }
@@ -46,6 +46,15 @@ export default function Dashboard() {
       alert(e.response?.data?.detail || 'Failed to add employee')
     }
     setAddingEmployee(false)
+  }
+
+  const handleDeleteEmployee = async (e, userId) => {
+    e.stopPropagation()
+    if (!window.confirm('Are you sure you want to remove this employee? All their tasks will be deleted too.')) return
+    await deleteUser(userId)
+    const [u, t] = await Promise.all([getUsers(), getTasks()])
+    setUsers(u.data.filter(u => u.role === 'employee'))
+    setTasks(t.data)
   }
 
   const getStats = (employeeId) => {
@@ -289,11 +298,28 @@ export default function Dashboard() {
                     <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 1 }}>{user.department || 'Employee'}</p>
                   </div>
                 </div>
-                <span style={{
-                  fontSize: 11, fontWeight: 700, padding: '4px 12px',
-                  borderRadius: 20, background: health.bg, color: health.color,
-                  border: `1px solid ${health.color}30`
-                }}>{health.label}</span>
+
+                {/* Health badge + delete button */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: '4px 12px',
+                    borderRadius: 20, background: health.bg, color: health.color,
+                    border: `1px solid ${health.color}30`
+                  }}>{health.label}</span>
+                  <button
+                    onClick={(e) => handleDeleteEmployee(e, user.id)}
+                    title="Remove employee"
+                    style={{
+                      background: 'none', border: '1px solid transparent',
+                      color: 'var(--muted)', width: 24, height: 24,
+                      borderRadius: 6, cursor: 'pointer', fontSize: 14,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s', flexShrink: 0
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#FEF2F2'; e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.borderColor = '#FECACA' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.borderColor = 'transparent' }}
+                  >×</button>
+                </div>
               </div>
 
               <div style={{ marginBottom: 20 }}>
