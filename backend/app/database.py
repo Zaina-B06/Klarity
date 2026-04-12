@@ -14,6 +14,10 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
+# Debug print - AFTER DATABASE_URL is defined
+print(f"DB_HOST={DB_HOST}")
+print(f"DATABASE_URL={DATABASE_URL}")
+
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
