@@ -2,7 +2,7 @@
 
 > AI-powered team management for small businesses. Real-time visibility for managers. Zero friction for employees.
 
-**Live Demo:** https://klarity-pink.vercel.app/
+**Live Demo:** https://klarity-five.vercel.app/
 **Backend API:** https://klarity-production-1c11.up.railway.app/
 
 ---
@@ -32,9 +32,21 @@
 
 ## Features
 
-**Manager** — Team dashboard, task management, AI advisor, analytics, team report
+### Manager
+- Team dashboard with employee health scores and completion rates
+- Create, assign, remind, and reassign tasks
+- WhatsApp notifications sent automatically on task assignment
+- AI Advisor — strategic team insights powered by Groq
+- Analytics — completion trends, priority breakdown, weekly charts
+- Employee detail view with AI behavioral insights
+- Generate and print team performance report
+- Personal task list
 
-**Employee** — My tasks, WhatsApp-native updates, personal analytics, AI coach
+### Employee
+- View and manage assigned tasks
+- Update task status via WhatsApp (reply START or DONE)
+- Personal analytics and performance calendar
+- AI Coach — personal feedback and coaching insights
 
 ---
 
