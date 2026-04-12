@@ -88,10 +88,11 @@ export default function ManagerTasks() {
   ]
 
   const inputStyle = {
-    width: '100%', padding: '10px 14px', borderRadius: 8,
-    border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)',
-    color: 'var(--text)', fontSize: 14, outline: 'none', fontFamily: 'Inter, sans-serif'
-  }
+  width: '100%', padding: '10px 14px', borderRadius: 8,
+  border: '1px solid var(--border)', background: 'var(--bg)',
+  color: 'var(--text)', fontSize: 14, outline: 'none',
+  fontFamily: 'Inter, sans-serif'
+}
 
   if (loading) return <p style={{ color: 'var(--muted)' }}>Loading...</p>
 
@@ -125,7 +126,7 @@ export default function ManagerTasks() {
           { label: 'Overdue', value: overdue.length, bg: 'linear-gradient(135deg, #EF4444, #DC2626)', icon: '!' },
         ].map(({ label, value, bg, icon }) => (
           <div key={label} style={{
-            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+            background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 12, padding: '16px 18px',
             display: 'flex', alignItems: 'center', gap: 12,
             position: 'relative', overflow: 'hidden'
@@ -142,7 +143,7 @@ export default function ManagerTasks() {
 
       {/* Progress bar */}
       <div style={{
-        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+        background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 12, padding: '16px 20px', marginBottom: 20
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -157,7 +158,7 @@ export default function ManagerTasks() {
       {/* Create task form */}
       {showForm && (
         <div style={{
-          background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--surface)', border: '1px solid var(--border)',
           borderRadius: 14, padding: 24, marginBottom: 20
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
@@ -190,7 +191,7 @@ export default function ManagerTasks() {
             <button onClick={handleCreate} disabled={submitting} style={{ background: '#4edea3', color: '#003824', border: 'none', padding: '9px 22px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
               {submitting ? 'Creating...' : 'Create Task'}
             </button>
-            <button onClick={() => setShowForm(false)} style={{ background: 'none', color: 'var(--muted)', border: '1px solid rgba(255,255,255,0.08)', padding: '9px 16px', borderRadius: 8, fontWeight: 500, fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>Cancel</button>
+            <button onClick={() => setShowForm(false)} style={{ background: 'none', color: 'var(--muted)', border: '1px solid var(--border)', padding: '9px 16px', borderRadius: 8, fontWeight: 500, fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>Cancel</button>
           </div>
         </div>
       )}
@@ -207,7 +208,7 @@ export default function ManagerTasks() {
             display: 'flex', alignItems: 'center', gap: 6
           }}>
             {label}
-            <span style={{ background: filter === key ? 'rgba(0,56,36,0.2)' : 'rgba(255,255,255,0.06)', fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 8, color: filter === key ? '#003824' : 'var(--muted)' }}>{count}</span>
+            <span style={{ background: filter === key ? 'rgba(0,56,36,0.2)' : 'var(--surface2)', fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 8, color: filter === key ? '#003824' : 'var(--muted)' }}>{count}</span>
           </button>
         ))}
       </div>
@@ -215,7 +216,7 @@ export default function ManagerTasks() {
       {/* Task list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '48px', color: 'var(--muted)', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ textAlign: 'center', padding: '48px', color: 'var(--muted)', background: 'var(--surface)', borderRadius: 12, border: '1px solid var(--border)' }}>
             <p style={{ fontSize: 28, marginBottom: 8 }}>✓</p>
             <p style={{ fontWeight: 600 }}>All clear!</p>
             <p style={{ fontSize: 13, marginTop: 4 }}>No tasks in this category</p>
@@ -229,7 +230,7 @@ export default function ManagerTasks() {
 
           return (
             <div key={task.id} className="task-card" style={{
-              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+              background: 'var(--surface)', border: '1px solid var(--border)',
               borderRadius: 12, padding: '18px 20px',
               borderLeft: isOverdue ? '3px solid #ef4444' : task.status === 'done' ? '3px solid #4edea3' : '3px solid transparent',
               opacity: task.status === 'done' ? 0.6 : 1,
@@ -262,7 +263,7 @@ export default function ManagerTasks() {
                     </>
                   )}
                   {task.status === 'done' && <span style={{ fontSize: 18, color: '#4edea3' }}>✓</span>}
-                  <button onClick={() => handleDelete(task.id)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--muted)', width: 28, height: 28, borderRadius: 6, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}
+                  <button onClick={() => handleDelete(task.id)} style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', width: 28, height: 28, borderRadius: 6, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'var(--muted)' }}
                   >×</button>
