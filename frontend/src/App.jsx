@@ -14,6 +14,7 @@ import AIAdvisor from './pages/AIAdvisor'
 import MyAdvisor from './pages/MyAdvisor'
 import EmployeeLayout from './components/EmployeeLayout'
 import ManagerTasks from './pages/ManagerTasks'
+import Report from './pages/Report'
 import './index.css'
 
 function ManagerLayout({ children }) {
@@ -58,6 +59,7 @@ function ManagerLayout({ children }) {
             { to: '/analytics', label: 'Analytics', icon: '∿' },
             { to: '/advisor', label: 'AI Advisor', icon: '✦' },
             { to: '/my-tasks-manager', label: 'My Tasks', icon: '◈' },
+            { to: '/report', label: 'Report', icon: '↓' },
           ].map(({ to, label, icon }) => (
             <NavLink key={to} to={to} style={({ isActive }) => ({
               display: 'flex', alignItems: 'center', gap: 10,
@@ -141,6 +143,7 @@ export default function App() {
           <Route path="/advisor" element={<ManagerLayout><AIAdvisor /></ManagerLayout>} />
           <Route path="/employee/:id" element={<ManagerLayout><EmployeeDetail /></ManagerLayout>} />
           <Route path="/my-tasks-manager" element={<ManagerLayout><ManagerTasks /></ManagerLayout>} />
+          <Route path="/report" element={<ManagerLayout><Report /></ManagerLayout>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
