@@ -3,15 +3,15 @@ import { getTasks, updateTaskStatus } from '../api'
 import { useAuth } from '../context/AuthContext'
 
 const priorityConfig = {
-  high: { color: '#EF4444', bg: '#FEF2F2', label: 'High' },
-  medium: { color: '#F59E0B', bg: '#FFFBEB', label: 'Medium' },
-  low: { color: '#10B981', bg: '#ECFDF5', label: 'Low' },
+  high: { color: '#EF4444', bg: 'rgba(239,68,68,0.12)', label: 'High' },
+  medium: { color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', label: 'Medium' },
+  low: { color: '#4edea3', bg: 'rgba(78,222,163,0.12)', label: 'Low' },
 }
 
 const statusConfig = {
-  pending: { color: '#6B7280', bg: '#F3F4F6', label: 'Pending' },
-  in_progress: { color: '#4F46E5', bg: '#EEF2FF', label: 'In Progress' },
-  done: { color: '#10B981', bg: '#ECFDF5', label: 'Done' },
+  pending: { color: 'rgba(218,226,253,0.5)', bg: 'rgba(255,255,255,0.06)', label: 'Pending' },
+  in_progress: { color: '#7bd0ff', bg: 'rgba(123,208,255,0.12)', label: 'In Progress' },
+  done: { color: '#4edea3', bg: 'rgba(78,222,163,0.12)', label: 'Done' },
 }
 
 export default function MyTasks() {
@@ -20,7 +20,6 @@ export default function MyTasks() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [updating, setUpdating] = useState(null)
-  
 
   const fetchTasks = () => {
     getTasks().then(res => {
@@ -48,9 +47,9 @@ export default function MyTasks() {
   const rate = tasks.length > 0 ? Math.round((done.length / tasks.length) * 100) : 0
 
   const getHealth = (r) => {
-    if (r >= 80) return { label: 'On Track', color: '#10B981', bg: '#ECFDF5' }
-    if (r >= 50) return { label: 'At Risk', color: '#F59E0B', bg: '#FFFBEB' }
-    return { label: 'Needs Attention', color: '#EF4444', bg: '#FEF2F2' }
+    if (r >= 80) return { label: 'On Track', color: '#4edea3' }
+    if (r >= 50) return { label: 'At Risk', color: '#F59E0B' }
+    return { label: 'Needs Attention', color: '#ef4444' }
   }
   const health = getHealth(rate)
 
@@ -71,51 +70,52 @@ export default function MyTasks() {
     return order[a.status] - order[b.status]
   })
 
-  if (loading) return <p style={{ color: 'var(--muted)' }}>Loading your tasks...</p>
+  if (loading) return <p style={{ color: 'rgba(218,226,253,0.5)' }}>Loading your tasks...</p>
 
   return (
     <div>
       <style>{`
-        .task-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important; }
+        .task-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important; }
         .task-card { transition: all 0.2s ease; }
       `}</style>
 
       {/* Header */}
       <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <h2 style={{ fontSize: 26, letterSpacing: '-0.5px' }}>My Tasks</h2>
-          <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>
+          <h2 style={{ fontSize: 26, letterSpacing: '-0.5px', color: 'var(--text)' }}>My Tasks</h2>
+          <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 4 }}>
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <div style={{
-          background: health.bg, border: `1px solid ${health.color}30`,
-          borderRadius: 10, padding: '8px 16px', textAlign: 'center'
+          background: `${health.color}18`,
+          border: `1px solid ${health.color}30`,
+          borderRadius: 12, padding: '10px 18px', textAlign: 'center'
         }}>
-          <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>My Health</p>
-          <p style={{ fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: 800, color: health.color }}>{rate}%</p>
+          <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>My Health</p>
+          <p style={{ fontSize: 22, fontFamily: 'Plus Jakarta Sans', fontWeight: 800, color: health.color }}>{rate}%</p>
         </div>
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
         {[
-          { label: 'Total', value: tasks.length, bg: 'linear-gradient(135deg, #4F46E5, #7C3AED)', icon: '▦' },
+          { label: 'Total', value: tasks.length, bg: 'linear-gradient(135deg, #4edea3, #10B981)', icon: '▦' },
           { label: 'Done', value: done.length, bg: 'linear-gradient(135deg, #10B981, #059669)', icon: '✓' },
-          { label: 'In Progress', value: inProgress.length, bg: 'linear-gradient(135deg, #4F46E5, #6366F1)', icon: '▶' },
+          { label: 'In Progress', value: inProgress.length, bg: 'linear-gradient(135deg, #7bd0ff, #4F46E5)', icon: '▶' },
           { label: 'Overdue', value: overdue.length, bg: 'linear-gradient(135deg, #EF4444, #DC2626)', icon: '!' },
         ].map(({ label, value, bg, icon }) => (
           <div key={label} style={{
             background: 'var(--surface)', border: '1px solid var(--border)',
-            borderRadius: 12, padding: '14px 18px',
+            borderRadius: 12, padding: '14px 16px',
             display: 'flex', alignItems: 'center', gap: 12,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden'
+            position: 'relative', overflow: 'hidden'
           }}>
             <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 3, background: bg }} />
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{icon}</div>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{icon}</div>
             <div>
               <p style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
-              <p style={{ fontSize: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 800, color: 'var(--text)', lineHeight: 1.1 }}>{value}</p>
+              <p style={{ fontSize: 22, fontFamily: 'Plus Jakarta Sans', fontWeight: 800, color: 'var(--text)', lineHeight: 1.1 }}>{value}</p>
             </div>
           </div>
         ))}
@@ -124,22 +124,17 @@ export default function MyTasks() {
       {/* Progress bar */}
       <div style={{
         background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 12, padding: '18px 22px', marginBottom: 20,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+        borderRadius: 12, padding: '16px 20px', marginBottom: 20
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <p style={{ fontSize: 14, fontWeight: 600 }}>Overall completion</p>
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: health.bg, color: health.color }}>{health.label}</span>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>Overall completion</p>
+            <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: `${health.color}18`, color: health.color }}>{health.label}</span>
           </div>
-          <p style={{ fontSize: 18, fontWeight: 700, color: health.color }}>{rate}%</p>
+          <p style={{ fontSize: 16, fontWeight: 700, color: health.color }}>{rate}%</p>
         </div>
-        <div style={{ height: 8, background: 'var(--surface2)', borderRadius: 4, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', width: `${rate}%`,
-            background: `linear-gradient(90deg, ${health.color}, ${health.color}99)`,
-            borderRadius: 4, transition: 'width 0.8s ease'
-          }} />
+        <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 3, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${rate}%`, background: health.color, borderRadius: 3, transition: 'width 0.8s ease' }} />
         </div>
       </div>
 
@@ -148,13 +143,14 @@ export default function MyTasks() {
         {filters.map(({ key, label, count }) => (
           <button key={key} onClick={() => setFilter(key)} style={{
             padding: '6px 14px', borderRadius: 7, border: 'none',
-            background: filter === key ? 'linear-gradient(135deg, #4F46E5, #7C3AED)' : 'transparent',
-            color: filter === key ? '#fff' : 'var(--muted)',
-            fontSize: 13, fontWeight: 500, cursor: 'pointer',
-            fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6
+            background: filter === key ? '#4edea3' : 'transparent',
+            color: filter === key ? '#003824' : 'var(--muted)',
+            fontSize: 13, fontWeight: filter === key ? 700 : 500,
+            cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+            display: 'flex', alignItems: 'center', gap: 6
           }}>
             {label}
-            <span style={{ background: filter === key ? 'rgba(255,255,255,0.25)' : 'var(--surface2)', fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 8, color: filter === key ? '#fff' : 'var(--muted)' }}>{count}</span>
+            <span style={{ background: filter === key ? 'rgba(0,56,36,0.2)' : 'rgba(255,255,255,0.06)', fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 8, color: filter === key ? '#003824' : 'var(--muted)' }}>{count}</span>
           </button>
         ))}
       </div>
@@ -164,7 +160,7 @@ export default function MyTasks() {
         {filtered.length === 0 && (
           <div style={{ textAlign: 'center', padding: '48px', color: 'var(--muted)', background: 'var(--surface)', borderRadius: 12, border: '1px solid var(--border)' }}>
             <p style={{ fontSize: 28, marginBottom: 8 }}>✓</p>
-            <p style={{ fontWeight: 600 }}>All clear!</p>
+            <p style={{ fontWeight: 600, color: 'var(--text)' }}>All clear!</p>
             <p style={{ fontSize: 13, marginTop: 4 }}>No tasks in this category</p>
           </div>
         )}
@@ -178,37 +174,36 @@ export default function MyTasks() {
             <div key={task.id} className="task-card" style={{
               background: 'var(--surface)', border: '1px solid var(--border)',
               borderRadius: 12, padding: '18px 20px',
-              borderLeft: isOverdue ? '3px solid #EF4444' : task.status === 'done' ? '3px solid #10B981' : '3px solid transparent',
-              opacity: task.status === 'done' ? 0.7 : 1,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+              borderLeft: isOverdue ? '3px solid #ef4444' : task.status === 'done' ? '3px solid #4edea3' : '3px solid transparent',
+              opacity: task.status === 'done' ? 0.6 : 1,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <p style={{ fontWeight: 600, fontSize: 15, textDecoration: task.status === 'done' ? 'line-through' : 'none', color: task.status === 'done' ? 'var(--muted)' : 'var(--text)' }}>{task.title}</p>
-                    {isOverdue && <span style={{ fontSize: 10, fontWeight: 700, color: '#EF4444', background: '#FEF2F2', padding: '2px 7px', borderRadius: 4 }}>OVERDUE</span>}
+                    <p style={{ fontWeight: 600, fontSize: 15, textDecoration: task.status === 'done' ? 'line-through' : 'none', color: task.status === 'done' ? 'rgba(218,226,253,0.4)' : 'var(--text)' }}>{task.title}</p>
+                    {isOverdue && <span style={{ fontSize: 10, fontWeight: 700, color: '#ef4444', background: 'rgba(239,68,68,0.12)', padding: '2px 7px', borderRadius: 4 }}>OVERDUE</span>}
                   </div>
                   {task.description && <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10 }}>{task.description}</p>}
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 6, background: p.bg, color: p.color, border: `1px solid ${p.color}20` }}>{p.label}</span>
-                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 6, background: s.bg, color: s.color, border: `1px solid ${s.color}20` }}>{s.label}</span>
-                    {task.deadline && <span style={{ fontSize: 12, color: isOverdue ? '#EF4444' : 'var(--muted)', fontWeight: isOverdue ? 600 : 400 }}>Due {new Date(task.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>}
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 6, background: p.bg, color: p.color }}>{p.label}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 6, background: s.bg, color: s.color }}>{s.label}</span>
+                    {task.deadline && <span style={{ fontSize: 12, color: isOverdue ? '#ef4444' : 'var(--muted)', fontWeight: isOverdue ? 600 : 400 }}>Due {new Date(task.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>}
                   </div>
                 </div>
 
                 {task.status !== 'done' && (
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                     {task.status === 'pending' && (
-                      <button onClick={() => handleStatusUpdate(task.id, 'in_progress')} disabled={isUpdating} style={{ background: '#EEF2FF', color: '#4F46E5', border: '1px solid #C7D2FE', padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                      <button onClick={() => handleStatusUpdate(task.id, 'in_progress')} disabled={isUpdating} style={{ background: 'rgba(123,208,255,0.12)', color: '#7bd0ff', border: '1px solid rgba(123,208,255,0.2)', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                         {isUpdating ? '...' : '▶ Start'}
                       </button>
                     )}
-                    <button onClick={() => handleStatusUpdate(task.id, 'done')} disabled={isUpdating} style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' }}>
+                    <button onClick={() => handleStatusUpdate(task.id, 'done')} disabled={isUpdating} style={{ background: '#4edea3', color: '#003824', border: 'none', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 2px 8px rgba(78,222,163,0.25)' }}>
                       {isUpdating ? '...' : '✓ Done'}
                     </button>
                   </div>
                 )}
-                {task.status === 'done' && <span style={{ fontSize: 20, flexShrink: 0, color: '#10B981' }}>✓</span>}
+                {task.status === 'done' && <span style={{ fontSize: 20, flexShrink: 0, color: '#4edea3' }}>✓</span>}
               </div>
             </div>
           )

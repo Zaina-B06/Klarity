@@ -1,10 +1,10 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
 
 export default function EmployeeLayout({ children }) {
   const { user, logout } = useAuth()
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('klarity_theme') === 'dark')
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('klarity_theme') !== 'light')
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
@@ -14,36 +14,31 @@ export default function EmployeeLayout({ children }) {
   const initials = user.name.split(' ').map(n => n[0]).join('')
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
       <nav style={{
-        width: 240, background: 'var(--surface)',
-        borderRight: '1px solid var(--border)',
-        padding: '0', display: 'flex', flexDirection: 'column',
+        width: 240, background: '#0d1528',
+        borderRight: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex', flexDirection: 'column',
         flexShrink: 0, position: 'sticky', top: 0, height: '100vh'
       }}>
-        {/* Top — logo + dark mode */}
-        <div style={{
-          padding: '24px 20px 16px',
-          borderBottom: '1px solid var(--border)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-        }}>
-          <div>
-            <h1 style={{ fontSize: 20, color: 'var(--accent)', letterSpacing: '-0.5px', fontFamily: 'Plus Jakarta Sans' }}>Klarity</h1>
-            <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>Workforce Intelligence</p>
+        {/* Top */}
+        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h1 style={{ fontSize: 20, color: '#4edea3', letterSpacing: '-0.5px', fontFamily: 'Plus Jakarta Sans' }}>Klarity</h1>
+              <p style={{ fontSize: 10, color: 'rgba(218,226,253,0.35)', marginTop: 1, letterSpacing: '0.05em' }}>INTELLIGENCE IN MOTION</p>
+            </div>
+            <button onClick={() => setDarkMode(!darkMode)} style={{
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 8, width: 32, height: 32, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15
+            }}>{darkMode ? '☀️' : '🌙'}</button>
           </div>
-          <button onClick={() => setDarkMode(!darkMode)} style={{
-            background: 'var(--surface2)', border: '1px solid var(--border)',
-            borderRadius: 8, width: 32, height: 32, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 16, flexShrink: 0
-          }}>
-            {darkMode ? '☀️' : '🌙'}
-          </button>
         </div>
 
-        {/* Nav links */}
+        {/* Nav */}
         <div style={{ padding: '16px 12px', flex: 1 }}>
-          <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.08em', padding: '0 8px', marginBottom: 8 }}>MENU</p>
+          <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(218,226,253,0.3)', letterSpacing: '0.1em', padding: '0 10px', marginBottom: 8 }}>MENU</p>
           {[
             { to: '/my-tasks', label: 'My Tasks', icon: '✓' },
             { to: '/my-analytics', label: 'My Analytics', icon: '∿' },
@@ -51,47 +46,43 @@ export default function EmployeeLayout({ children }) {
           ].map(({ to, label, icon }) => (
             <NavLink key={to} to={to} style={({ isActive }) => ({
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 12px', borderRadius: 8, textDecoration: 'none',
-              color: isActive ? 'var(--accent)' : 'var(--muted)',
-              background: isActive ? 'var(--accent-light)' : 'transparent',
+              padding: '10px 12px', borderRadius: 9, textDecoration: 'none',
+              color: isActive ? '#4edea3' : 'rgba(218,226,253,0.5)',
+              background: isActive ? 'rgba(78,222,163,0.1)' : 'transparent',
               fontWeight: isActive ? 600 : 400, fontSize: 14,
-              transition: 'all 0.15s', marginBottom: 2
+              transition: 'all 0.15s', marginBottom: 2,
+              border: isActive ? '1px solid rgba(78,222,163,0.15)' : '1px solid transparent'
             })}>
               <span style={{ fontSize: 13 }}>{icon}</span>{label}
             </NavLink>
           ))}
         </div>
 
-        {/* Bottom — user + logout */}
-        <div style={{
-          padding: '16px 20px',
-          borderTop: '1px solid var(--border)',
-          display: 'flex', alignItems: 'center', gap: 10
-        }}>
+        {/* Bottom */}
+        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 32, height: 32, borderRadius: '50%',
-            background: 'var(--accent-light)', color: 'var(--accent)',
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'rgba(78,222,163,0.15)', color: '#4edea3',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700, flexShrink: 0
+            fontSize: 12, fontWeight: 700, flexShrink: 0, border: '1px solid rgba(78,222,163,0.2)'
           }}>{initials}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</p>
-            <p style={{ fontSize: 11, color: 'var(--muted)' }}>{user.department || 'Employee'}</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#dae2fd', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</p>
+            <p style={{ fontSize: 11, color: 'rgba(218,226,253,0.35)' }}>{user.department || 'Employee'}</p>
           </div>
           <button onClick={logout} title="Logout" style={{
-            background: 'none', border: '1px solid var(--border)',
+            background: 'none', border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: 7, width: 30, height: 30, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--muted)', fontSize: 14, flexShrink: 0,
-            transition: 'all 0.15s'
+            color: 'rgba(218,226,253,0.4)', fontSize: 14, transition: 'all 0.15s'
           }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#EF4444'; e.currentTarget.style.color = '#EF4444' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(218,226,253,0.4)' }}
           >→</button>
         </div>
       </nav>
 
-      <main style={{ flex: 1, padding: '40px 48px', overflowY: 'auto', background: 'var(--bg)' }}>
+      <main style={{ flex: 1, padding: '36px 48px', overflowY: 'auto', background: 'var(--bg)', color: 'var(--text)' }}>
         {children}
       </main>
     </div>

@@ -11,6 +11,7 @@ import Landing from './pages/Landing'
 import EmployeeDetail from './pages/EmployeeDetail'
 import MyAnalytics from './pages/MyAnalytics'
 import AIAdvisor from './pages/AIAdvisor'
+import MyAdvisor from './pages/MyAdvisor'
 import EmployeeLayout from './components/EmployeeLayout'
 import ManagerTasks from './pages/ManagerTasks'
 import './index.css'
@@ -20,9 +21,9 @@ function ManagerLayout({ children }) {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('klarity_theme') !== 'light')
 
   useEffect(() => {
-  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
-  localStorage.setItem('klarity_theme', darkMode ? 'dark' : 'light')
-}, [darkMode])
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+    localStorage.setItem('klarity_theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
 
   if (!user) return <Navigate to="/login" />
   if (user.role !== 'manager') return <Navigate to="/my-tasks" />
@@ -35,9 +36,8 @@ function ManagerLayout({ children }) {
         display: 'flex', flexDirection: 'column',
         flexShrink: 0, position: 'sticky', top: 0, height: '100vh'
       }}>
-        {/* Top */}
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h1 style={{ fontSize: 20, color: '#4edea3', letterSpacing: '-0.5px', fontFamily: 'Plus Jakarta Sans' }}>Klarity</h1>
               <p style={{ fontSize: 10, color: 'rgba(218,226,253,0.35)', marginTop: 1, letterSpacing: '0.05em' }}>INTELLIGENCE IN MOTION</p>
@@ -50,7 +50,6 @@ function ManagerLayout({ children }) {
           </div>
         </div>
 
-        {/* Nav */}
         <div style={{ padding: '16px 12px', flex: 1 }}>
           <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(218,226,253,0.3)', letterSpacing: '0.1em', padding: '0 10px', marginBottom: 8 }}>MENU</p>
           {[
@@ -74,7 +73,6 @@ function ManagerLayout({ children }) {
           ))}
         </div>
 
-        {/* Bottom */}
         <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
             width: 34, height: 34, borderRadius: '50%',
@@ -136,6 +134,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/my-tasks" element={<ProtectedEmployee />} />
           <Route path="/my-analytics" element={<ProtectedEmployeeAnalytics />} />
+          <Route path="/my-advisor" element={<ProtectedEmployeeAdvisor />} />
           <Route path="/dashboard" element={<ManagerLayout><Dashboard /></ManagerLayout>} />
           <Route path="/tasks" element={<ManagerLayout><Tasks /></ManagerLayout>} />
           <Route path="/analytics" element={<ManagerLayout><Analytics /></ManagerLayout>} />
