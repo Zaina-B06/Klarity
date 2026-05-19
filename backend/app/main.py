@@ -36,7 +36,7 @@ def keep_alive():
     while True:
         time.sleep(14 * 60)
         try:
-            requests.get("https://klarity-production-1c11.up.railway.app/")
+            requests.get("https://klarity-backend-7nhh.onrender.com/")
             print("Keep-alive ping sent")
         except:
             pass
