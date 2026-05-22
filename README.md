@@ -11,7 +11,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
-![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
  
 ### [🚀 Live App](https://klarity-five.vercel.app/) · [📦 GitHub](https://github.com/Zaina-B06/Klarity)
  
@@ -61,10 +61,10 @@ Built as a solo full-stack project to push myself on real production engineering
 - MySQL
 </td>
 <td valign="top" width="33%">
-### AI & Integrations
+### AI & Deployment
 - Groq API (LLaMA 3)
 - WhatsApp Cloud API
-- Railway (backend)
+- Render (backend)
 - Vercel (frontend)
 </td>
 </tr>
