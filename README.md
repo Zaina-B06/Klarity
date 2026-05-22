@@ -1,26 +1,72 @@
-Klarity ⚡
-
-AI-powered workforce intelligence platform for small teams — task management, real-time analytics, and AI advisor in one dual-role SaaS.
-
-Live App | GitHub
-What it does
-Klarity is a full-stack workforce platform built for small teams who want visibility into productivity without changing how they work. It ships with two distinct experiences — one for managers, one for employees — built around five core modules:
-
-Dual-Role Dashboards — Managers see team-wide analytics and performance; employees see their own workload, tasks, and progress
-Task Management — Managers assign and track tasks; employees view, update, and complete them
-AI Advisor — Powered by Groq's LLaMA 3, gives both managers and employees contextual insights, summaries, and recommendations
-Analytics — Real-time performance tracking, workload visibility, and team productivity metrics
-Reports — Generate employee and team performance reports
-WhatsApp Notifications — Optional integration via WhatsApp Cloud API for task assignments and updates
-
-Why I built it
-Most workforce tools (Asana, Monday, ClickUp) overwhelm small teams with feature bloat. Klarity is an attempt at the opposite: a simple, AI-first platform that gives a 5-person team visibility into who's doing what, without the setup overhead. Built as a solo full-stack project to push myself on real production engineering — auth, deployment, AI integration, dual-role UI.
-Tech Stack
-
-Frontend: React (Vite), React Router, Axios, Context API for auth state
-Backend: Python, FastAPI
-Auth: JWT-based authentication
-Database: MySQL
-AI: Groq API (LLaMA 3) for the AI Advisor
-Integrations: WhatsApp Cloud API (Meta)
-Deployment: Backend on Railway, Frontend on Vercel
+# ⚡ Klarity
+ 
+### AI-Powered Workforce Intelligence Platform
+ 
+*Task management, real-time analytics, and AI advisor — all in one dual-role SaaS for small teams.*
+ 
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
+ 
+### [🚀 Live App](https://klarity-five.vercel.app/) · [📦 GitHub](https://github.com/Zaina-B06/Klarity)
+ 
+</div>
+---
+ 
+## 🎯 What It Does
+ 
+Klarity is a full-stack workforce platform built for small teams who want visibility into productivity without changing how they work. It ships with **two distinct experiences** — one for managers, one for employees — built around five core modules.
+ 
+| Module | Manager View | Employee View |
+|--------|--------------|---------------|
+| **Dashboard** | Team-wide analytics & performance | Personal workload overview |
+| **Tasks** | Assign and track team tasks | View, update, complete tasks |
+| **AI Advisor** | Strategic insights & summaries | Personal recommendations |
+| **Analytics** | Real-time team productivity | Individual progress metrics |
+| **Reports** | Generate team performance reports | View own performance |
+ 
+> 💬 **Plus:** Optional WhatsApp notifications via Meta's WhatsApp Cloud API for task assignments and updates.
+ 
+---
+ 
+## 💡 Why I Built It
+ 
+Most workforce tools (Asana, Monday, ClickUp) overwhelm small teams with feature bloat. Klarity is an attempt at the opposite: a **simple, AI-first platform** that gives a 5-person team visibility into who's doing what, without the setup overhead.
+ 
+Built as a solo full-stack project to push myself on real production engineering — auth, deployment, AI integration, and dual-role UI.
+ 
+---
+ 
+## 🛠️ Tech Stack
+ 
+<table>
+<tr>
+<td valign="top" width="33%">
+### Frontend
+- React (Vite)
+- React Router
+- Axios
+- Context API (Auth)
+</td>
+<td valign="top" width="33%">
+### Backend
+- Python
+- FastAPI
+- JWT Authentication
+- MySQL
+</td>
+<td valign="top" width="33%">
+### AI & Integrations
+- Groq API (LLaMA 3)
+- WhatsApp Cloud API
+- Railway (backend)
+- Vercel (frontend)
+</td>
+</tr>
+</table>
+---
